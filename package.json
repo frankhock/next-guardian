@@ -5,10 +5,11 @@
   "repository": "https://github.com/frankhock/next-guardian.git",
   "main": "index.js",
   "scripts": {
+    "dev": "rollup --config --watch",
     "build": "rollup --config",
     "prepare": "rollup --config"
   },
-  "author": "",
+  "author": "Frank Hock",
   "license": "ISC",
   "sideEffects": false,
   "dependencies": {

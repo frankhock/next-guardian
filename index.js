@@ -14,7 +14,7 @@ module.exports = (nextApp, {
   bodyParserUrlEncodedOptions = { extended: true },
   csrf = true,
   // URL base path for authentication routes (optional).
-  // Note: The prefix value of '/auth' is currently hard coded in 
+  // Note: The prefix value of '/auth' is currently hard coded in
   // next-auth-client so you should not change this unless you also modify it.
   pathPrefix = '/auth',
   // Express Server (optional).
@@ -23,7 +23,7 @@ module.exports = (nextApp, {
   expressSession = ExpressSession,
   // Secret used to encrypt session data on the server.
   sessionSecret = 'change-me',
-  // Session store for express-session. 
+  // Session store for express-session.
   // Defaults to an in memory store, which is not recommended for production.
   sessionStore = expressSession.MemoryStore(),
   // The name of the session ID cookie to set in the response (and read from in
@@ -35,7 +35,7 @@ module.exports = (nextApp, {
   sessionMaxAge = 60000 * 60 * 24 * 7,
   // Session Revalidation in X ms (optional, default is 60 seconds).
   // Specifies how often a Single Page App should revalidate a session.
-  // Does not impact the session life on the server, but causes clients to 
+  // Does not impact the session life on the server, but causes clients to
   // refetch session info (even if it is in a local cache) after N seconds has
   // elapsed since it was last checked so they always display state correctly.
   // If set to 0 will revalidate a session before rendering every page.
@@ -54,13 +54,14 @@ module.exports = (nextApp, {
   // Note When this option is set to true but the saveUninitialized option
   // is set to false, the cookie will not be set on a response with an
   // uninitialized session https://www.npmjs.com/package/express-session#rolling
+
   sessionRolling = true,
   // Forces a session that is "uninitialized" to be saved to the store.
-  // A session is uninitialized when it is new but not modified. Choosing false 
+  // A session is uninitialized when it is new but not modified. Choosing false
   // is useful for implementing login sessions, reducing server storage usage,
-  // or complying with laws that require permission before setting a cookie. 
+  // or complying with laws that require permission before setting a cookie.
   //
-  // Choosing false will also help with race conditions where a client makes 
+  // Choosing false will also help with race conditions where a client makes
   // multiple parallel requests without a session.
   //
   // Note that if the build in CSRF protection is enabled (the default) then
@@ -68,7 +69,7 @@ module.exports = (nextApp, {
   // https://www.npmjs.com/package/express-session#saveuninitialized
   sessionSaveUninitialized = false,
   // Canonical URL of the server (optional, but recommended).
-  // e.g. 'http://localhost:3000' or 'https://www.example.com' 
+  // e.g. 'http://localhost:3000' or 'https://www.example.com'
   // Used in callbak URLs and email sign in links. It will be auto generated
   // if not specified, which may cause problems if your site uses multiple
   // aliases (e.g. 'example.com and 'www.examples.com').
@@ -108,9 +109,11 @@ module.exports = (nextApp, {
       password = null
     } = {}) => { Promise.resolve(user) }
     */
-  }
+  },
+  // send extra strategy params to api to link accounts.
+  autoLinkAccounts = false,
 } = {}) => {
-  
+
   if (typeof(functions) !== 'object') {
     throw new Error('functions must be a an object')
   }
@@ -151,7 +154,7 @@ module.exports = (nextApp, {
       maxAge: sessionMaxAge
     }
   }))
-  
+
   if (csrf === true) {
     // If csrf is true (default) apply to all routes
     expressApp.use(lusca.csrf())
@@ -159,7 +162,7 @@ module.exports = (nextApp, {
     // If csrf is anything else (except false) then pass it as a config option
     expressApp.use(lusca.csrf(csrf))
   } // if csrf is explicitly set to false then doesn't apply CSRF at all
-  
+
   if (trustProxy === true) {
     expressApp.set('trust proxy', 1)
   }
@@ -172,9 +175,10 @@ module.exports = (nextApp, {
     expressApp: expressApp,
     serverUrl: serverUrl,
     providers: providers,
-    functions: functions
+    functions: functions,
+    autoLinkAccounts,
   })
-  
+
   /*
    * Add route to get CSRF token via AJAX
    */
@@ -198,10 +202,10 @@ module.exports = (nextApp, {
       revalidateAge: sessionRevalidateAge,
       csrfToken: res.locals._csrf
     }
-    
+
     if (req.user)
       session.user = req.user
-      
+
     if (functions.session)
       session = functions.session(session, req)
 
@@ -215,7 +219,7 @@ module.exports = (nextApp, {
     req.linked = () => {
       return new Promise((resolve, reject) => {
         if (!req.user) return resolve({})
-      
+
         functions.serialize(req.user)
         .then(id => {
           if (!id) throw new Error("Unable to serialize user")
@@ -223,22 +227,22 @@ module.exports = (nextApp, {
         })
         .then(user => {
           if (!user) return resolve({})
-    
+
           let linkedAccounts = {}
           providers.forEach(provider => {
             linkedAccounts[provider.providerName] = (user[provider.providerName.toLowerCase()]) ? true : false
           })
-      
+
           return resolve(linkedAccounts)
         })
         .catch(err => {
           return reject(err)
-        })  
+        })
       })
     }
     next()
   })
-  
+
   // Client side REST endpoint for returning list of accounts user has linked.
   // Called when pages are rendered in the browser (instead of req.linked()).
   // Returns all accounts the user has linked (e.g. Twitter, Facebook, Google…)
@@ -254,12 +258,12 @@ module.exports = (nextApp, {
     })
     .then(user => {
       if (!user) return res.json({})
-        
+
       let linkedAccounts = {}
       providers.forEach(provider => {
         linkedAccounts[provider.providerName] = (user[provider.providerName.toLowerCase()]) ? true : false
       })
-      
+
       return res.json(linkedAccounts)
     })
     .catch(err => {
@@ -269,8 +273,8 @@ module.exports = (nextApp, {
 
   /*
    * Return list of configured oAuth Providers
-   * 
-   * We define this both as a server side function and a RESTful endpoint so 
+   *
+   * We define this both as a server side function and a RESTful endpoint so
    * that it can be used rendering a page both server side and client side.
    */
   // Server side function
@@ -285,7 +289,7 @@ module.exports = (nextApp, {
           }
         })
         return resolve(configuredProviders)
-      })    
+      })
     }
     next()
   })
@@ -337,7 +341,7 @@ module.exports = (nextApp, {
       })
     })
   }
-  
+
   /*
    * Enable /auth/email/signin  routes if sendSignInEmail() function is passed
    */
@@ -347,7 +351,7 @@ module.exports = (nextApp, {
      */
     expressApp.post(`${pathPrefix}/email/signin`, (req, res) => {
       const email = req.body.email || null
-    
+
       if (!email || email.trim() === '') {
         res.redirect(`${pathPrefix}`)
       }
@@ -390,7 +394,7 @@ module.exports = (nextApp, {
     })
 
     /*
-     * Verify token in callback URL for email sign in 
+     * Verify token in callback URL for email sign in
      */
     expressApp.get(`${pathPrefix}/email/signin/:token`, (req, res) => {
       if (!req.params.token) {
@@ -448,10 +452,10 @@ module.exports = (nextApp, {
       providers: providers,
       port: port
     }
-    
+
     // If no port specified, don't start Express automatically
     if (!port) return resolve(response)
-    
+
     // If an instance of nextApp was passed, have it handle all other routes
     if (nextApp) {
       expressApp.all('*', (req, res) => {
@@ -459,7 +463,7 @@ module.exports = (nextApp, {
         return nextRequestHandler(req, res)
       })
     }
-    
+
     // Start Express
     return expressApp.listen(port, err => {
       if (err) reject(err)
