@@ -122,10 +122,6 @@ module.exports = ({
           profile.email = `${providerName.toLowerCase()}-${profile.id}@localhost.localdomain`
         }
 
-        if (autoLinkAccounts) {
-          console.log('hell yeah link account');
-        }
-
         let findParams = {
           provider: {
             name: providerName.toLowerCase(),
