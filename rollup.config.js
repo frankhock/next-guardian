@@ -17,5 +17,5 @@ export default {
       presets: [['env', { modules: false }]]
     })
   ],
-  
+
 }
