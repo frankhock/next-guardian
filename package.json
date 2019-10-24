@@ -1,6 +1,6 @@
 {
   "name": "next-guardian",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "An authentication library for Next.js",
   "repository": "https://github.com/frankhock/next-guardian.git",
   "main": "index.js",
