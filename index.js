@@ -112,6 +112,7 @@ module.exports = (nextApp, {
   },
   // send extra strategy params to api to link accounts.
   autoLinkAccounts = false,
+  extraCookieProps = {},
 } = {}) => {
 
   if (typeof(functions) !== 'object') {
@@ -141,19 +142,22 @@ module.exports = (nextApp, {
     expressApp.use(BodyParser.json(bodyParserJsonOptions))
     expressApp.use(BodyParser.urlencoded(bodyParserUrlEncodedOptions))
   }
-  expressApp.use(expressSession({
-    secret: sessionSecret,
-    store: sessionStore,
-    resave: sessionResave,
-    rolling: sessionRolling,
-    saveUninitialized: sessionSaveUninitialized,
-    cookie: {
-      name: sessionCookie,
-      httpOnly: true,
-      secure: 'auto',
-      maxAge: sessionMaxAge
-    }
-  }))
+  expressApp.use(
+    expressSession({
+      secret: sessionSecret,
+      store: sessionStore,
+      resave: sessionResave,
+      rolling: sessionRolling,
+      saveUninitialized: sessionSaveUninitialized,
+      cookie: {
+        name: sessionCookie,
+        httpOnly: true,
+        secure: 'auto',
+        maxAge: sessionMaxAge,
+        ...extraCookieProps,
+      },
+    }),
+  );
 
   if (csrf === true) {
     // If csrf is true (default) apply to all routes
