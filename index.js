@@ -375,8 +375,10 @@ module.exports = (
             return res.redirect(`${pathPrefix}?action=emailSignin&type=invalid`)
           }
         })
-        .catch((err) => {
-          return res.redirect(`${pathPrefix}?action=emailSignin&type=invalid`)
+        .catch((errorType) => {
+          return res.redirect(
+            `${pathPrefix}?action=emailSignin&type=${errorType || invalid}`,
+          )
         })
     })
   }
