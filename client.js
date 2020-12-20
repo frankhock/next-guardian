@@ -21,11 +21,11 @@
       key: 'init',
 
       /**
-       * This is an async, isometric method which returns a session object - 
+       * This is an async, isometric method which returns a session object -
        * either by looking up the current express session object when run on the
        * server, or by using fetch (and optionally caching the result in local
-       * storage) when run on the client.  
-       * 
+       * storage) when run on the client.
+       *
        * Note that actual session tokens are not stored in local storage, they are
        * kept in an HTTP Only cookie as protection against session hi-jacking by
        * malicious JavaScript.
@@ -259,7 +259,7 @@
                     if (response.ok) {
                       return response;
                     } else {
-                      console.log("NextAuth Error Fetching Providers");
+                      console.log('NextAuth Error Fetching Providers');
                       return null;
                     }
                   }).then(function (response) {
@@ -267,7 +267,7 @@
                   }).then(function (data) {
                     return data;
                   }).catch(function (e) {
-                    console.log("NextAuth Error Loading Providers");
+                    console.log('NextAuth Error Loading Providers');
                     console.log(e);
                     return null;
                   }));
@@ -289,7 +289,7 @@
 
       /*
        * Sign in
-       * 
+       *
        * Will post a form to /auth/signin auth route if an object is passed.
        * If the details are valid a session will be created and you should redirect
        * to your callback page so the session is loaded in the client.
